@@ -1,6 +1,6 @@
 $(document).ready(function () {
 
-    var $offers = $('#offers');
+    var $member_detail = $('#member_detail');
     var $members = $('#members');
     var $mdm_person_id =$('#mdm_person_id');
     var $user_id=$('#user_id');
@@ -16,6 +16,7 @@ $(document).ready(function () {
                 $.each(members, function(i,member) {
                     //console.log(member);
                     $members.append('<li>name: '+member.name +'   age: '+member.age + '</li>');
+
                 });
             },
             error: function() {
@@ -48,7 +49,20 @@ $(document).ready(function () {
            // data: {"mdm_person_id":"1", "user_Id":"hkolukul", "policy_id":"00123890"},
             datatype: 'json',
             success: function(response) {
-                $offers.append('<li>LastName: '+response.firstname +'   FirstName: '+response.lastname + ' Offer1: '+response.offers[0].offer_name + ' Offer2: '+response.offers[1].offer_name + '</li>');
+                var res = "";
+                res += "<tr><td>"+response.mdm_person_id+"</td><td>"+response.firstname+"</td><td>"+response.lastname+"</td><td>"+response.user_id+"</td><td>"+response.policy_id+"</td></tr>";
+                if(res != "") {
+                    $("#member_detail").append(res).removeClass("hidden");
+                }
+                $.each(response.offers, function(i,offer) {
+                    var txt = "";
+                    txt += "<tr><td>"+offer.offer_name+"</td><td>"+offer.score+"</td></tr>";
+
+                    if(txt != "") {
+                        $("#offers").append(txt).removeClass("hidden");
+                        $("#response").removeClass("hidden");
+                    }
+                });
             },
             error: function() {
                 console.log("Errors in calling Web service");
