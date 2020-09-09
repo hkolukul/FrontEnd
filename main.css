@@ -42,7 +42,7 @@ button:hover {
     color: white;
 }
 
-#offers,#member_detail tr:hover {background-color: #ddd;}
+#offers tr:hover,#member_detail tr:hover {background-color: #ddd;}
 
 .hidden {display:none;}
 
