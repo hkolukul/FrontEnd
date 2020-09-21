@@ -29,6 +29,9 @@ $(document).ready(function () {
 
         $("#member_detail").addClass("hidden");
         $("#offers").addClass("hidden");
+        $("#accept").addClass("hidden");
+        $("#reject").addClass("hidden");
+        $("#end").addClass("hidden");
         $("#member_detail").find("tr:gt(0)").remove();
         $("#offers").find("tr:gt(0)").remove();
         // $('member_detail').children( 'tr:not(:first)' ).remove();
@@ -63,68 +66,121 @@ $(document).ready(function () {
                     txt = txt + "</tr>";
                     if (txt != "") {
                         $("#offers").append(txt).removeClass("hidden");
-                        $("#response").removeClass("hidden");
+                        $("#accept").removeClass("hidden");
+                        $("#reject").removeClass("hidden");
+                        $("#end").removeClass("hidden");
                     }
 
                 });
 
 
-                    $(".ERow").change(function () {
-                        var $selValue = $("input[type='radio']:checked").val();
-                        $.each(response.offers, function (i, offer) {
-                            if ($("input[type='radio']:checked").val() == offer.offer_name) {
-                                // console.log(offer.offer_name);
-                                // console.log(offer.treatmentCode);
-                                // console.log(response.session_id);
-                                $('#accept').on('click', function () {
-                                    var acceptEvent = {
-                                        sessionId: response.session_id,
-                                        eventName: "accept",
-                                        treatmentCode: offer.treatmentCode
-                                    };
-                                    $.ajax({
-                                        method: 'POST',
-                                        url: "http://localhost:8080/IcIntegration/ic/offers/response",
-                                        data: JSON.stringify(acceptEvent),
-                                        contentType: "application/json; charset=utf-8",
-                                        datatype: 'json',
-                                        success: function (response) {
-                                            if (response.peStatus == 0)
-                                                alert(offer.offer_name + " accepted.");
-                                        }
-                                    });
-                                });
+                $(".ERow").change(function () {
+                    $.each(response.offers, function (i, offer) {
+                        if ($("input[type='radio']:checked").val() == offer.offer_name) {
+                            // console.log(offer.offer_name);
+                            // console.log(offer.treatmentCode);
+                            // console.log(response.session_id);
+                            var contactEvent = {
+                                sessionId: response.session_id,
+                                eventName: "contact",
+                                treatmentCode: offer.treatmentCode
+                            };
 
-                                $('#reject').on('click', function () {
-                                    console.log("in reject function");
-                                    var rejectEvent = {
-                                        sessionId: response.session_id,
-                                        eventName: "reject",
-                                        treatmentCode: offer.treatmentCode
-                                    };
+                            $.ajax({
+                                method: 'POST',
+                                url: "http://localhost:8080/IcIntegration/ic/offers/contact",
+                                data: JSON.stringify(contactEvent),
+                                contentType: "application/json; charset=utf-8",
+                                datatype: 'json',
+                                success: function (response) {
+                                    if (response.peStatus == 0)
+                                        console.log(offer.offer_name + " Contacted.");
+                                    else
+                                        alert("issue in contacting " + offer.offer_name);
+                                }
+                            });
 
-                                    $.ajax({
-                                        method: 'POST',
-                                        url: "http://localhost:8080/IcIntegration/ic/offers/response",
-                                        data: JSON.stringify(rejectEvent),
-                                        contentType: "application/json; charset=utf-8",
-                                        datatype: 'json',
-                                        success: function (response) {
-                                            if (response.peStatus == 0)
-                                                alert(offer.offer_name + " rejected.");
-                                        }
-                                    });
+
+                            $('#accept').on('click', function () {
+                                var acceptEvent = {
+                                    sessionId: response.session_id,
+                                    eventName: "accept",
+                                    treatmentCode: offer.treatmentCode
+                                };
+                                $.ajax({
+                                    method: 'POST',
+                                    url: "http://localhost:8080/IcIntegration/ic/offers/response",
+                                    data: JSON.stringify(acceptEvent),
+                                    contentType: "application/json; charset=utf-8",
+                                    datatype: 'json',
+                                    success: function (response) {
+                                        if (response.peStatus == 0)
+                                            alert(offer.offer_name + " accepted.");
+                                    },
+                                    error: function () {
+                                        alert("Errors in calling accept session web service");
+                                    } 
                                 });
-                            }
-                        });
+                            });
+
+                            $('#reject').on('click', function () {
+                                console.log("in reject function");
+                                var rejectEvent = {
+                                    sessionId: response.session_id,
+                                    eventName: "reject",
+                                    treatmentCode: offer.treatmentCode
+                                };
+
+                                $.ajax({
+                                    method: 'POST',
+                                    url: "http://localhost:8080/IcIntegration/ic/offers/response",
+                                    data: JSON.stringify(rejectEvent),
+                                    contentType: "application/json; charset=utf-8",
+                                    datatype: 'json',
+                                    success: function (response) {
+                                        if (response.peStatus == 0)
+                                            alert(offer.offer_name + " rejected.");
+                                    },
+                                    error: function () {
+                                        alert("Errors in calling reject event web service");
+                                    } 
+                                });
+                            });
+                            
+                            $('#end').on('click', function () {
+                               // console.log("in reject function");
+                                var endEvent = {
+                                    sessionId: response.session_id,
+                                    eventName: "",
+                                    treatmentCode: ""
+                                };
+
+                                $.ajax({
+                                    method: 'POST',
+                                    url: "http://localhost:8080/IcIntegration/ic/offers/end",
+                                    data: JSON.stringify(endEvent),
+                                    contentType: "application/json; charset=utf-8",
+                                    datatype: 'json',
+                                    success: function (response) {
+                                        if (response.peStatus == 0)
+                                            alert("Session ended");
+                                            location.reload();
+                                    },
+                                    error: function () {
+                                        alert("Errors in calling end session web service");
+                                    } 
+                                    
+                                });
+                            });
+
+                        }
                     });
+                });
             },
             error: function () {
-                console.log("Errors in calling Web service");
+                alert("Errors in calling get offers web service");
             }
         });
-
-        console.log("I am at then end")
 
     });
 
